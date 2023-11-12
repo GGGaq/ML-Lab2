@@ -1,1 +1,2 @@
-feature/*.csv
+feature/
+_pycache_/
