@@ -8,6 +8,7 @@ from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
 import bayesian
 import numpy as np
+import decisiontree as decision_diy
 
 import data_loader, feature_extract, evaluation
 
@@ -45,6 +46,12 @@ x_test = pca.transform(x_test)
 print('--- start fitting ---')
 Model_Bayesian_Diy = bayesian.Bayesian()
 Model_Bayesian_Diy.fit(x_train,y_train)
+
+Model_Decisiontree_Diy=[]
+for i in range(20):
+    print(i)
+    Model_Decisiontree_Diy.append(decision_diy.DecisionTreeClassifier_Diy(max_depth=i+1))
+    Model_Decisiontree_Diy[i].fit(x_train, y_train)
 
 Model_KNeighbors = []
 for i in range(20):
@@ -116,8 +123,21 @@ print('max depth is ',max_depth)
 evaluation.ModelEvaluation(y_true = y_test, y_pred = y_pred_final, ModelName = 'test')
 
 print('--- Decision Tree Diy Result ---')
-
-
+x_data = []
+y_data = []
+max_depth = -1
+y_pred_final = None
+max_accuracy = -1
+for i in range(20):
+    y_pred = Model_Decisiontree_Diy[i].predict(x_test)
+    x_data.append(i)
+    Accuracy = accuracy(y_test,y_pred)
+    y_data.append(Accuracy)
+    y_pred_final = y_pred if Accuracy > max_accuracy else y_pred_final
+    max_depth = i+1 if Accuracy > max_accuracy else max_depth 
+draw(x_data,y_data,'Decisiontree Max Depth')
+print('max depth is ',max_depth)
+evaluation.ModelEvaluation(y_true = y_test, y_pred = y_pred_final, ModelName = 'test')
 
 print('--- Random Forest Result ---')
 print('-- 测试max_depth参数 --')
